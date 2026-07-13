@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIDC - Servicios Integrales Cázares</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <style>
+        :root { 
+            --verde-industrial: #007A33; 
+            --verde-neon: #00a844; 
+            --borde-metal: rgba(0, 168, 68, 0.4);
+            --fondo-iluminado: radial-gradient(circle at 50% 30%, #1c1e1d 0%, #0b0c0c 100%);
+            --vidrio-acero: rgba(255, 255, 255, 0.03); 
+            --borde-acero: rgba(255, 255, 255, 0.08); 
+            --cromo: linear-gradient(135deg, #f0f0f0 0%, #ffffff 25%, #cccccc 45%, #e1e1e1 70%, #aaaaaa 100%);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            background: var(--fondo-iluminado); 
+            color: #f5f5f5; 
+            overflow-x: hidden; 
+        }
+        
+        #particulas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.28; }
+        
+        .cabecera { background: rgba(11, 12, 12, 0.9); backdrop-filter: blur(20px); padding: 18px; border-bottom: 2px solid var(--verde-industrial); position: sticky; top: 0; z-index: 1000; text-align: center; }
+        .cabecera img { max-width: 150px; }
+        
+        .portada { width: 100%; min-height: 100vh; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; }
+        .portada-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: -1; }
+        .sombra { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, #0b0c0c 0%, rgba(11,12,12,0.4) 60%, transparent 100%); z-index: -1; }
+        .portada-texto { padding: 40px 20px 100px; max-width: 900px; }
+        
+        .portada h1 { font-size: clamp(2.4rem, 7vw, 3.8rem); color: #fff; margin-bottom: 15px; font-weight: 800; }
+        .portada p { font-size: clamp(1.1rem, 3vw, 1.3rem); color: #ccc; margin-bottom: 35px; max-width: 850px; line-height: 1.7; }
+        
+        .contenedor { max-width: 1200px; margin: 0 auto; padding: 80px 20px; position: relative; z-index: 1; }
+        
+        .titulo-seccion { text-align: center; margin-bottom: 60px; }
+        .titulo-seccion h2 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; letter-spacing: 1px; color: #ffffff; text-transform: uppercase; margin-bottom: 15px; }
+        .titulo-seccion h2 span { color: var(--verde-neon); }
+        .titulo-seccion p { color: #aaa; max-width: 700px; margin: 0 auto; font-size: 1rem; }
+        
+        .grid-industrial { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+        .tarjeta-tecnica { background: var(--vidrio-acero); border: 1px solid var(--borde-acero); border-radius: 12px; overflow: hidden; transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); backdrop-filter: blur(8px); }
+        .tarjeta-tecnica:hover { border-color: var(--verde-neon); transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0, 168, 68, 0.2); }
+        .tarjeta-img { width: 100%; height: 240px; object-fit: cover; filter: grayscale(30%) brightness(90%); transition: 0.4s; }
+        .tarjeta-tecnica:hover .tarjeta-img { filter: grayscale(0%) brightness(100%); }
+        .tarjeta-cuerpo { padding: 30px; }
+        .tarjeta-tecnica h3 { color: #ffffff; font-size: 1.35rem; font-weight: 700; margin-bottom: 12px; border-left: 3px solid var(--verde-neon); padding-left: 10px; }
+        .tarjeta-tecnica p { color: #adbcbc; line-height: 1.7; font-size: 0.95rem; }
+        
+        .manifiesto-ingenieria { background: linear-gradient(135deg, rgba(0, 122, 51, 0.15) 0%, rgba(11, 12, 12, 0.6) 100%); border: 2px solid var(--verde-industrial); border-radius: 16px; padding: 50px 40px; text-align: center; margin: 60px 0; box-shadow: inset 0 0 20px rgba(0,168,68,0.05); }
+        .manifiesto-ingenieria h2 { color: #fff; font-size: 2rem; font-weight: 700; margin-bottom: 20px; letter-spacing: 0.5px; }
+        .manifiesto-ingenieria p { color: #e2ebe6; line-height: 1.8; max-width: 950px; margin: 0 auto; font-size: 1.1rem; }
+        
+        .btn { background: var(--verde-industrial); color: white; padding: 16px 36px; border-radius: 4px; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; display: inline-block; margin: 5px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 0.95rem; }
+        .btn:hover { background: var(--verde-neon); box-shadow: 0 0 25px rgba(0,168,68,0.5); transform: translateY(-2px); }
+        .btn-borde { background: transparent; border: 2px solid var(--verde-industrial); color: #fff; }
+        .btn-borde:hover { background: var(--verde-industrial); }
+        .btn-wsp { background: #25D366; border-color: transparent; }
+        .btn-wsp:hover { background: #1da851; }
+        
+        .mapa-global { margin-top: 60px; text-align: center; }
+        .mapa-contenedor { border-radius: 12px; overflow: hidden; border: 1px solid var(--borde-metal); margin-bottom: 15px; }
+        .mapa-contenedor iframe { width: 100%; height: 400px; border: none; display: block; filter: grayscale(20%) invert(90%) hue-rotate(90deg) brightness(95%); }
+        .mapa-global p { color: #aaa; font-size: 0.95rem; margin-top: 10px; }
+        .mapa-global a { color: var(--verde-neon); text-decoration: underline; }
+        
+        .pie { background: #060707; border-top: 1px solid var(--borde-acero); padding: 50px 20px; text-align: center; position: relative; z-index: 1; }
+        .pie img { max-width: 130px; margin-bottom: 20px; opacity: 0.8; }
+        .pie p { color: #55605a; font-size: 0.85rem; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+        .botones-flotantes { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: row; align-items: center; gap: 14px; z-index: 9999; 
+            background: linear-gradient(135deg, rgba(200,200,200,0.1) 0%, rgba(255,255,255,0.25) 30%, rgba(100,100,100,0.1) 70%);
+            border: 1.5px solid var(--borde-metal); padding: 10px 18px; border-radius: 40px;
+            backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.4);
+        }
+        .btn-flotante { 
+            width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            color: #111312 !important; font-size: 20px; text-decoration: none; background: var(--cromo);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.8); transition: all 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            border: 1px solid #999; cursor: pointer;
+        }
+        .btn-flotante:hover { transform: scale(1.15) translateY(-3px); border-color: var(--verde-neon); box-shadow: 0 0 20px rgba(0, 168, 68, 0.7); }
+        
+        .ventana-qr { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(6,7,7,0.95); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
+        .contenido-qr { background: #111312; border: 2px solid var(--borde-metal); border-radius: 16px; padding: 40px; max-width: 420px; width: 100%; text-align: center; position: relative; }
+        .cerrar-qr { position: absolute; top: 15px; right: 20px; color: #666; font-size: 30px; cursor: pointer; }
+        .cerrar-qr:hover { color: var(--verde-neon); }
+        #codigo-qr { margin: 25px auto; padding: 15px; background: #fff; border-radius: 8px; display: inline-block; }
+        .url-qr { color: var(--verde-neon); font-size: 0.85rem; word-break: break-all; }
+
+        @media (max-width: 768px) {
+            .botones-flotantes { bottom: 15px; padding: 8px 14px; gap: 10px; }
+            .btn-flotante { width: 40px; height: 40px; font-size: 18px; }
+            .mapa-contenedor iframe { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="particulas"></canvas>
+
+<header class="cabecera">
+    <img src="CazaresLogoVerde.png" alt="SIDC - Servicios Integrales Cázares">
+</header>
+
+<section class="portada">
+    <img src="PortadaTaller.jpg" alt="Instalaciones y capacidad operativa" class="portada-img">
+    <div class="sombra"></div>
+    <div class="portada-texto">
+        <h1>Servicios Integrales Cázares</h1>
+        <p>Soluciones técnicas integrales para industria, comercio y sector residencial. Equipamiento especializado, cumplimiento normativo y garantía de calidad con sede en Apodaca, Nuevo León.</p>
+        <div style="margin-top: 30px;">
+            <a href="#servicios" class="btn">NUESTROS SERVICIOS</a>
+            <a href="#contacto" class="btn btn-borde">COTIZACIÓN</a>
+            <a href="https://wa.me/528116710029?text=Hola,%20solicito%20información%20técnica" target="_blank" class="btn btn-wsp">WHATSAPP</a>
+        </div>
+    </div>
+</section>
+
+<div class="contenedor" id="servicios">
+    <div class="titulo-seccion">
+        <h2>Catálogo de <span>Servicios</span></h2>
+        <p>Atención especializada para cualquier requerimiento técnico, desde mantenimiento preventivo hasta fabricación de proyectos exclusivos.</p>
+    </div>
+
+    <div class="grid-industrial">
+        <div class="tarjeta-tecnica">
+            <img src="MaquinadoGeneral.jpg" alt="Mantenimiento y reparación técnica" class="tarjeta-img">
+            <div class="tarjeta-cuerpo">
+                <h3>Mantenimiento y Reparación Técnica</h3>
+                <p>Ejecución de protocolos preventivos, predictivos y correctivos para maquinaria, equipos e infraestructura. Incluye análisis de precisión, monitoreo de vibraciones, acoplamientos y ajustes para garantizar la continuidad operativa.</p>
+            </div>
+        </div>
+        <div class="tarjeta-tecnica">
+            <img src="MaquinadoCNC.jpg" alt="Fabricación y precisión" class="tarjeta-img">
+            <div class="tarjeta-cuerpo">
+                <h3>Fabricación y Tecnología de Precisión</h3>
+                <p>Procesos en CNC, cortes exactos, doblado y ensamble. Incorporamos escaneo láser para digitalización de diseños y fabricación de piezas conforme a especificaciones técnicas o muestras.</p>
+            </div>
+        </div>
+        <div class="tarjeta-tecnica">
+            <img src="SoldaduraEspecializada.jpg" alt="Estructuras y protección" class="tarjeta-img">
+            <div class="tarjeta-cuerpo">
+                <h3>Soldadura, Estructuras y Elementos de Protección</h3>
+                <p>Procesos certificados de soldadura en todo tipo de metales. Fabricación de portones, divisiones, barandillas, elementos de seguridad y estructuras con resistencia conforme al uso previsto.</p>
+            </div>
+        </div>
+        <div class="tarjeta-tecnica">
+            <img src="AutomatizacionControl.jpg" alt="Sistemas y seguridad" class="tarjeta-img">
+            <div class="tarjeta-cuerpo">
+                <h3>Sistemas Eléctricos, Control y Seguridad</h3>
+                <p>Instalación de sensores de precisión, temperatura, iluminación, cámaras, control de acceso, alarmas, bombas sumergibles, sistemas hidráulicos y pistones. Automatización y protección integral de instalaciones.</p>
+            </div>
+        </div>
+        <div class="tarjeta-tecnica">
+            <img src="PuestoTrabajo.jpg" alt="Acabados y diseño" class="tarjeta-img">
+            <div class="tarjeta-cuerpo">
+                <h3>Pintura, Acabados y Diseño Visual</h3>
+                <p>Recubrimientos industriales y residenciales, acabados en madera, murales artísticos, rotulación de logotipos y señalización. Protección y embellecimiento con resultados duraderos y estéticos.</p>
+            </div>
+        </div>
+        <div class="tarjeta-tecnica">
+            <img src="ProduccionIndustrial.jpg" alt="Adecuaciones generales" class="tarjeta-img">
+            <div class="tarjeta-cuerpo">
+                <h3>Adecuaciones y Mantenimiento General</h3>
+                <p>Carpintería, plomería, tablaroca, fabricación de asadores, hornos y mesas de trabajo. Atención integral para inmuebles residenciales, corporativos e industriales de cualquier magnitud.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="manifiesto-ingenieria" id="ingenieria">
+        <h2>Compromiso con la Excelencia</h2>
+        <p>Equipo capacitado y equipamiento especializado para proyectos de diversa complejidad. Cumplimos estrictamente con normativas vigentes, entregamos garantía formal y operamos con cobertura en la zona metropolitana de Monterrey y todo el estado de Nuevo León.</p>
+    </div>
+
+    <div class="mapa-global" id="contacto">
+        <h2>Ubicación y Contacto</h2>
+        <div class="mapa-contenedor">
+            <iframe src="https://maps.google.com/maps?q=511%205%20de%20Mayo,%20Apodaca,%20Nuevo%20Le%C3%B3n&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p><a href="https://maps.app.goo.gl/67W8WwMsYR7gZcMc6" target="_blank">Ver en Google Maps</a> | Calle 5 de Mayo N° 511, Colonia Centro, Apodaca, Nuevo León, C.P. 66600</p>
+        <div style="margin-top: 25px;">
+            <a href="https://wa.me/528116710029?text=Hola,%20solicito%20mi%20cotización%20formal" target="_blank" class="btn btn-wsp">SOLICITAR COTIZACIÓN SIN COSTO</a>
+        </div>
+    </div>
+</div>
+
+<footer class="pie">
+    <img src="CazaresLogoNegro.png" alt="SIDC - Servicios Integrales Cázares">
+    <p>© 2026 Servicios Integrales Cázares. Todos los derechos reservados.</p>
+    <p>Sede en Apodaca, Nuevo León | Cobertura en la región metropolitana y todo el estado</p>
+</footer>
+
+<div class="botones-flotantes">
+    <button class="btn-flotante" onclick="abrirQR()" title="Compartir sitio"><i class="fa-solid fa-qrcode"></i></button>
+    <a href="https://wa.me/528116710029?text=Hola,%20solicito%20información" target="_blank" class="btn-flotante" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+    <a href="https://www.facebook.com/share/1Hdg8BJYr1/" target="_blank" class="btn-flotante" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+    <a href="https://www.instagram.com/emotion_systems?igsh=NzlxeXRzdXY5NTJp" target="_blank" class="btn-flotante" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+    <a href="https://github.com/dcg2390/DCG-laboratory" target="_blank" class="btn-flotante" title="GitHub"><i class="fa-brands fa-github"></i></a>
+</div>
+
+<div class="ventana-qr" id="ventanaQR">
+    <div class="contenido-qr">
+        <span class="cerrar-qr" onclick="cerrarQR()">×</span>
+        <h3 style="color:#fff; text-transform:uppercase; margin-bottom:10px;">Compartir Sitio Web</h3>
+        <p style="color:#aaa; font-size:0.9rem;">Escanee el código o copie la dirección para compartir nuestros servicios.</p>
+        <div id="codigo-qr"></div>
+        <span class="url-qr" id="urlPagina"></span>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('particulas');
+const ctx = canvas.getContext('2d');
+let herramientas = [], total = 12; 
+
+function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+addEventListener('resize', resize); resize();
+
+class Herramienta {
+    constructor() { this.reset(); this.y = Math.random() * canvas.height; }
+    reset() { 
+        this.x = Math.random() * canvas.width; 
+        this.y = -90; 
+        this.vel = 0.4 + Math.random() * 0.6; 
+        this.rot = Math.random() * Math.PI * 2; 
+        this.rotVel = (Math.random() - 0.5) * 0.008; 
+        this.tam = 30 + Math.random() * 18; 
+        this.tipo = Math.random() > 0.5 ? 'perica' : 'espanola'; 
+        this.esVerde = Math.random() > 0.8; 
+    }
+    actualizar() { this.y += this.vel; this.rot += this.rotVel; if (this.y > canvas.height + 90) this.reset(); }
+    
+    dibujar() {
+        ctx.save(); 
+        ctx.translate(this.x, this.y); 
+        ctx.rotate(this.rot); 
+        
+        let gradMetal = ctx.createLinearGradient(-this.tam, -this.tam, this.tam, this.tam);
+        if (this.esVerde) {
+            gradMetal.addColorStop(0, '#001a08'); gradMetal.addColorStop(0.4, '#00a844'); gradMetal.addColorStop(1, '#000d04');
+        } else {
+            gradMetal.addColorStop(0, '#444'); gradMetal.addColorStop(0.3, '#cccccc'); gradMetal.addColorStop(0.5, '#ffffff'); gradMetal.addColorStop(1, '#222');
+        }
+        ctx.fillStyle = gradMetal;
+        
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = this.esVerde ? 'rgba(0,168,68,0.2)' : 'rgba(255,255,255,0.1)';
+
+        if (this.tipo === 'perica') {
+            ctx.fillRect(-this.tam * 0.14, -this.tam * 0.6, this.tam * 0.28, this.tam * 1.2);
+            ctx.beginPath(); ctx.arc(0, -this.tam * 0.6, this.tam * 0.42, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#0f1110';
+            ctx.fillRect(-this.tam * 0.28, -this.tam * 0.8, this.tam * 0.32, this.tam * 0.25);
+        } 
+        else {
+            ctx.fillRect(-this.tam * 0.11, -this.tam * 0.75, this.tam * 0.22, this.tam * 1.5);
+            ctx.beginPath(); ctx.arc(0, -this.tam * 0.75, this.tam * 0.32, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(0, this.tam * 0.75, this.tam * 0.32, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#0f1110';
+            ctx.save(); ctx.translate(0, -this.tam * 0.75); ctx.rotate(0.2); ctx.fillRect(-this.tam * 0.15, -this.tam * 0.4, this.tam * 0.3, this.tam * 0.4); ctx.restore();
+            ctx.save(); ctx.translate(0, this.tam * 0.75); ctx.rotate(0.2); ctx.fillRect(-this.tam * 0.15, 0, this.tam * 0.3, this.tam * 0.4); ctx.restore();
+        }
+        ctx.restore();
+    }
+}
+
+for(let i = 0; i < total; i++) herramientas.push(new Herramienta());
+function animar() { ctx.clearRect(0, 0, canvas.width, canvas.height); herramientas.forEach(h => { h.actualizar(); h.dibujar(); }); requestAnimationFrame(animar); }
+animar();
+
+const urlActual = window.location.href;
+document.getElementById('urlPagina').textContent = urlActual;
+QRCode.toCanvas(document.getElementById('codigo-qr'), urlActual, { width: 200, margin: 1, color: { dark: '#111312', light: '#ffffff' } });
+
+function abrirQR() { document.getElementById('ventanaQR').style.display = 'flex'; }
+function cerrarQR() { document.getElementById('ventanaQR').style.display = 'none'; }
+document.getElementById('ventanaQR').addEventListener('click', e => { if(e.target.id === 'ventanaQR') cerrarQR(); });
+</script>
+</body>
+</html>
