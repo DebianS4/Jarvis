@@ -4,5 +4,4 @@ https://github.com/open-jarvis/OpenJarvis/tree/main/.github
 
 <p align='center'><img src='social-preview.jpg' alt='DCG-LAB Jarvis IA'></p>
 
-📊 ESTADÍSTICAS
-Estadísticas Lenguajes Racha de actividad
+📊
